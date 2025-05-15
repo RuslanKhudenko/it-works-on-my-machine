@@ -1,0 +1,47 @@
+version: '3.9'
+services:
+  backend:
+    build:
+      context: ../
+      dockerfile: ./docker/golang/Dockerfile
+    hostname: golang-backend
+    ports:
+        - 8080:8080
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - homework-network
+
+  postgres:
+    image: postgres:latest
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ../db_schema.sql:/docker-entrypoint-initdb.d/db_schema.sql
+    environment:
+      - POSTGRES_PASSWORD=db_password
+      - POSTGRES_USER=db_user
+    networks:
+      - homework-network
+
+  redis:
+    image: redis:latest
+    ports:
+      - 6379:6379
+    command: [ "redis-server" ]
+    volumes:
+      - redis-data:/data
+    networks:
+      - homework-network
+
+networks:
+  homework-network:
+    name: homework-network
+
+volumes:
+  postgres-data:
+  redis-data:
