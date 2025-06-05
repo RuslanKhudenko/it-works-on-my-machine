@@ -1,0 +1,11 @@
+global:
+  resolve_timeout: 5m
+route:
+  group_wait: 0s
+  group_interval: 1s
+  group_by: [ alertname ]
+  receiver: 'main' # default receiver
+  repeat_interval: 5s
+
+receivers:
+  - name: 'main'
