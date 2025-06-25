@@ -1,0 +1,98 @@
+version: '3.9'
+services:
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9500:9090"
+    expose:
+      - 9190
+    volumes:
+      - $PWD/monitoring:/etc/monitoring
+    command:
+      - --config.file=/etc/monitoring/prometheus.yml
+      - --log.level=debug
+      - --web.listen-address=:9090
+      - --web.page-title='Prometheus'
+    networks:
+      - homework-network
+
+  alertmanager:
+    container_name: homework-alertmanager
+    image: prom/alertmanager:latest
+    ports:
+      - "9094:9093"
+    volumes:
+      - $PWD/monitoring:/etc/monitoring
+      - alertmanager-data:/data
+    command:
+      - --config.file=/etc/monitoring/alertmanager.yml
+    networks:
+      - homework-network
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "4000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - prometheus
+      - loki
+    networks:
+      - homework-network
+
+  loki:
+    image: grafana/loki:2.9.0
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/monitoring/loki.yaml
+    volumes:
+      - $PWD/monitoring/:/etc/monitoring/
+      - loki-data:/loki
+    networks:
+      - homework-network
+
+  promtail:
+    image: grafana/promtail:2.9.0
+    volumes:
+      - /var/log:/var/log:ro
+      - /etc/machine-id:/etc/machine-id:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - $PWD/monitoring:/etc/monitoring
+    command:
+      - -config.file=/etc/monitoring/promtail.yaml
+    networks:
+      - homework-network
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    ports:
+      - "8090:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+    networks:
+      - homework-network
+
+  node_exporter:
+    image: prom/node-exporter:latest
+    container_name: node_exporter
+    restart: unless-stopped
+    ports:
+      - "9100:9100"
+    networks:
+      - homework-network
+
+networks:
+  homework-network:
+    external: true
+
+volumes:
+  grafana-data:
+  alertmanager-data:
+  loki-data:
