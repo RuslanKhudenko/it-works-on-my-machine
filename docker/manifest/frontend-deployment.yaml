@@ -17,6 +17,9 @@ spec:
           image: ruslanamo/homework-it-works-on-my-machine-frontend
           ports:
             - containerPort: 3000
+          env:
+            - name: REACT_APP_BACKEND_URL
+              value: http://localhost:8080
 ---
 apiVersion: v1
 kind: Service
