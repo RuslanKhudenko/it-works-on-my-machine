@@ -1,0 +1,49 @@
+backendImage:
+  repository: ruslanamo/homework-it-works-on-my-machine-backend
+  tag: latest
+  pullPolicy: IfNotPresent
+  containerPort: 8080
+  replicaCount: 1
+
+backendService:
+  type: LoadBalancer
+  port: 8080
+
+frontendImage:
+  repository: ruslanamo/homework-it-works-on-my-machine-frontend
+  tag: latest
+  pullPolicy: IfNotPresent
+  containerPort: 3000
+  replicaCount: 1
+  backendUrl: "http://localhost:8080"
+
+frontendService:
+  type: LoadBalancer
+  port: 80
+
+redis:
+  architecture: standalone
+  networkPolicy:
+    enabled: true
+  auth:
+    enabled: false
+  master:
+    persistence:
+      enabled: false
+    service:
+      type: ClusterIP
+      port: 6379
+  fullnameOverride: it-works-on-my-machine-redis
+  labels:
+    app.kubernetes.io/component: master
+    app.kubernetes.io/instance: it-works-on-my-machine
+    app.kubernetes.io/name: redis
+
+postgresql:
+  auth:
+    username: myuser
+    password: mypassword
+    database: mydb
+  primary:
+    persistence:
+      enabled: false
