@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "frontend.fullname" . }}
+  labels:
+    app: {{ include "frontend.name" . }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ include "frontend.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "frontend.name" . }}
+    spec:
+      containers:
+        - name: {{ include "frontend.name" . }}
+          image: "{{ .Values.frontendImage.repository }}:{{ .Values.frontendImage.tag }}"
+          ports:
+            - containerPort: {{ .Values.frontendImage.containerPort }}
+          env:
+            - name: REACT_APP_BACKEND_URL
+              value: {{ .Values.frontendImage.backendUrl }}
