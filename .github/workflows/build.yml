@@ -1,4 +1,4 @@
-name: Build & Push Images
+name: build-push-deploy
 
 on:
   workflow_dispatch:
@@ -11,6 +11,11 @@ on:
         description: "Tag for frontend image"
         required: true
         default: "latest"
+
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
 
 jobs:
   build-and-push:
