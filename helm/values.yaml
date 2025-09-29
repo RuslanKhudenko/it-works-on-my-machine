@@ -1,6 +1,6 @@
 backendImage:
   repository: ruslanamo/homework-it-works-on-my-machine-backend
-  tag: latest
+  tag: 599819a
   pullPolicy: IfNotPresent
   containerPort: 8080
   replicaCount: 1
@@ -11,7 +11,7 @@ backendService:
 
 frontendImage:
   repository: ruslanamo/homework-it-works-on-my-machine-frontend
-  tag: latest
+  tag: 599819a
   pullPolicy: IfNotPresent
   containerPort: 3000
   replicaCount: 1

@@ -1,0 +1,56 @@
+name: Build & Push Images
+
+on:
+  workflow_dispatch:
+    inputs:
+      backend_tag:
+        description: "Tag for backend image"
+        required: true
+        default: "latest"
+      frontend_tag:
+        description: "Tag for frontend image"
+        required: true
+        default: "latest"
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker registry
+        uses: docker/login-action@v3
+        with:
+          registry: docker.io
+          username: {{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - id: commit_hash
+        run: |
+          echo "commit_hash=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+          echo "${GITHUB_SHA::7}" > commit_hash
+
+      - name: Save commit hash to GITHUB ENV
+        run: |
+          echo "COMMIT_HASH=$(cat commit_hash)" >> $GITHUB_ENV
+
+      - name: Build & Push Backend Image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          file: ./backend/docker/golang/Dockerfile
+          push: true
+          tags: ruslanamo/homework-it-works-on-my-machine-backend:${{ env.COMMIT_HASH }}
+
+      - name: Build & Push Frontend Image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          file: ./frontend/docker/node/Dockerfile
+          push: true
+          tags: ruslanamo/homework-it-works-on-my-machine-frontend:${{ env.COMMIT_HASH }}
