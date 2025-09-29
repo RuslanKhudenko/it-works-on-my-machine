@@ -2,23 +2,10 @@ name: build-push-deploy
 
 on:
   workflow_dispatch:
-    inputs:
-      backend_tag:
-        description: "Tag for backend image"
-        required: true
-        default: "latest"
-      frontend_tag:
-        description: "Tag for frontend image"
-        required: true
-        default: "latest"
-
-  pull_request:
-    branches:
-      - main
-    types: [opened, synchronize, reopened]
 
 jobs:
   build-and-push:
+    if: contains(join(github.event.pull_request.labels.*.name, ','), 'run_build')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code

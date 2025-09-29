@@ -7,7 +7,7 @@ metadata:
     argocd-image-updater.argoproj.io/image-list: backend=ruslanamo/homework-it-works-on-my-machine-backend,frontend=ruslanamo/homework-it-works-on-my-machine-frontend
     argocd-image-updater.argoproj.io/backend.update-strategy: latest
     argocd-image-updater.argoproj.io/frontend.update-strategy: latest
-    argocd-image-updater.argoproj.io/write-back-method: argocd
+    argocd-image-updater.argoproj.io/write-back-method: git
 spec:
   project: default
   source:
